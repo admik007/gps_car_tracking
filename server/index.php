@@ -360,7 +360,7 @@ $km_st=0;
     preg_match('"(.*)\"formatted_address\" : \"(.*)\""',$decoded,$m);
     if($m[2] != '') {
      $miesto="GGL: ".$m[2];
-     MySQL_Query("INSERT INTO $MySQL_table3 VALUES('$GET_LAT','$GET_LON','$m[2]')");
+     MySQL_Query("INSERT INTO $MySQL_table3 VALUES('$GET_LAT','$GET_LON','$m[2]','OK');");
     } else {
      $miesto="GGL ERR: no info";
     }
