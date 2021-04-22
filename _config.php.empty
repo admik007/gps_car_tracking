@@ -1,0 +1,10 @@
+<?php
+@$MySQL_server="localhost";
+@$MySQL_user="MYSQL_USER";
+@$MySQL_user_password="MYSQL_PASS";
+@$MySQL_db="MYSQL_DB";
+@$MySQL_table1="gps_tracking";
+@$MySQL_table2="gps_tracking_archive";
+@$MySQL_table3="gps_miesto";
+@$GAPIKEY="YOUR_GOOGLE_API_KEY_FOR_GEOLOCATION";
+?>
