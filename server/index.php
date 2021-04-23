@@ -77,10 +77,10 @@ if(isset($_GET["loadrpi"])) $loadrpi=$_GET["loadrpi"];
 
 
 $HOST=$_SERVER["SERVER_NAME"];
-if ($HOST != "gps.sj-construct.sk") {
+if ($HOST != "gps.DIFFERENT_HOST.sk") {
  $SHOW='1';
 } else {
-$device="SL514BS";
+$device="NODE04";
 }
 
 if (!empty($_GET["time"])) {
@@ -107,10 +107,10 @@ if (!empty($_GET["time"])) {
  if ($SHOW == "1") {
   $ZTK_DEVICES="<tr>
   <td align=\"center\">
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=KE482LM\" style=\"text-decoration:none\"><b>KE482LM</b></a> -
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=KE978IE\" style=\"text-decoration:none\"><b>KE978IE</b></a> -
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=SL514BS\" style=\"text-decoration:none\"><b>SL514BS</b></a> -
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE08\" style=\"text-decoration:none\"><b>NODE08</b></a>
+   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE01\" style=\"text-decoration:none\"><b>NODE01</b></a> -
+   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE02\" style=\"text-decoration:none\"><b>NODE02</b></a> -
+   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE03\" style=\"text-decoration:none\"><b>NODE03</b></a> -
+   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE04\" style=\"text-decoration:none\"><b>NODE04</b></a>
   </td>
  </tr>";
  } else {
