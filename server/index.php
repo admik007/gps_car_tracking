@@ -323,12 +323,7 @@ $km_st=0;
   if (($entries['direction'] > '226') and ($entries['direction'] < '275' )) { $direction='Z';}
   if (($entries['direction'] > '276') and ($entries['direction'] < '366' )) { $direction='S';}
 
-  $miesto=' - - - ';
   $bgmiesto='#ffffff';
-#  if ($entries['lat'] > '48.767') { $miesto='KE-smer Server SK';}
-#  if ($entries['lat'] < '48.658') { $miesto='KE-smer Juh SK';}
-#  if ($entries['lon'] > '21.322') { $miesto='KE-smer Vychod SK';}
-#  if ($entries['lon'] < '21.189') { $miesto='KE-smer Zapad SK';}
 
   include ('locations.php');
 ############################################
