@@ -92,7 +92,7 @@ if (!empty($_GET["time"])) {
 } else {
  $REQUESTED=$month;
  $CURRENT=Date("m");
- $CURRENTLAST=date("m", strtotime( date( "Y-m-d", strtotime( date("Y-m-d") ) ) . "-1 month" ) );
+ $CURRENTLAST=date("m", strtotime( date( "Y-m-d", strtotime( date("Y-m-d") ) ) . "-0 month" ) );
  if (($CURRENT == $REQUESTED) || ($CURRENTLAST == $REQUESTED)) {
   $MySQL_table=$MySQL_table1;
  }
