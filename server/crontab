@@ -1,3 +1,4 @@
 ### STAFF REGARDING GPS MONITORINGU
  7  *   * * *   root    echo "UPDATE gps_tracking set time = replace(time, 'Z', ''); UPDATE gps_tracking set time = replace(time, 'T', ' '); " | mysql  --defaults-extra-file=/root/.mysql/mysqldump.cnf DATABASE > /dev/null 2>&1
-00  0   1 * *   root    echo "INSERT INTO gps_tracking_archive SELECT * FROM gps_tracking WHERE time < DATE_FORMAT(CURRENT_DATE(),'%Y-%m-%d') - INTERVAL 0 HOUR ORDER BY id DESC; DELETE FROM gps_tracking WHERE time < DATE_FORMAT(CURRENT_DATE(),'%Y-%m-%d') - INTERVAL 0 HOUR; " | mysql  --defaults-extra-file=/root/.mysql/mysqldump.cnf DATAABSE > /dev/null 2>&1
+05  0   1 * *   root    /home/data/bin/mysql_tracking_move_old_month.sh
+00  0   * * *   root    /home/data/bin/mysql_tracking_delete_node.sh
