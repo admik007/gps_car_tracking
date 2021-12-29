@@ -1,3 +1,6 @@
+<?php
+if(empty($_GET["devicerpi"])) {
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -24,8 +27,14 @@
  <link href="calendar.css" type="text/css" rel="stylesheet">
 </head>
 <body bgcolor="silver">
+<?php } else { ?>
+<html>
+<head>
+<title> <?php echo $_GET["devicerpi"]; ?> </title>
+</head>
+<body>
+<?php }
 
-<?php
 $starttime = explode(' ', microtime());
 $starttime = $starttime[1] + $starttime[0];
 
@@ -35,14 +44,14 @@ mysql_connect($MySQL_server, $MySQL_user, $MySQL_user_password);
 $spojenie=mysql_connect($MySQL_server,$MySQL_user,$MySQL_user_password);
 $spojeniedb=mysql_select_db($MySQL_db);
 
-$ip=$_SERVER["REMOTE_ADDR"]; 
+$ip=$_SERVER["REMOTE_ADDR"];
 
 
 if (empty($_GET["day"])) $day=Date("d");
 if(isset($_GET["day"])) $day=$_GET["day"];
 
 if (empty($_GET["month"])) $month=Date("m");
-if(isset($_GET["month"])) $month=$_GET["month"]; 
+if(isset($_GET["month"])) $month=$_GET["month"];
 
 if (empty($_GET["year"])) $year=Date("Y");
 if(isset($_GET["year"])) $year=$_GET["year"];
@@ -65,7 +74,7 @@ if(isset($_GET["sat"])) $sat=$_GET["sat"];
 if(isset($_GET["bat"])) $bat=$_GET["bat"];
 if(isset($_GET["time"])) $time=$_GET["time"];
 
-if (empty($_GET["device"])) $device="KE978IE";
+if (empty($_GET["device"])) $device="NODE01";
 if(isset($_GET["device"])) $device=$_GET["device"];
 
 if(isset($_GET["provider"])) $provider=$_GET["provider"];
@@ -77,10 +86,16 @@ if(isset($_GET["loadrpi"])) $loadrpi=$_GET["loadrpi"];
 
 
 $HOST=$_SERVER["SERVER_NAME"];
-if ($HOST != "gps.DIFFERENT_HOST.sk") {
- $SHOW='1';
+if ($HOST == "node01.domain.com") {
+ $SHOW='0';
+ $device="NODE01";
+}
+
+if ($HOST == "node02.domain.com") {
+ $SHOW='0';
+ $device="NODE02";
 } else {
-$device="NODE04";
+ $SHOW='1';
 }
 
 if (!empty($_GET["time"])) {
@@ -88,6 +103,22 @@ if (!empty($_GET["time"])) {
  $timeZ=str_replace("Z","\Z",$timeT);
  $epoch= strtotime (gmdate($timeZ));
  $time=date ('Y-m-d\TH:i:s\Z',$epoch);
+
+
+ switch ($devicerpi) {
+  case "00000000XXXXXXX2":
+   $device='NODE01';
+   break;
+
+  case "00000000XXXXXXX2":
+   $device='NODE02';
+   break;
+
+  default:
+   $device=' UNKNOWN';
+ }
+
+ echo $device;
  MySQL_Query("INSERT INTO $MySQL_table1 VALUES('0','$lat','$lon','$alt','$acc','$spd','$sat','$time','$bat','$ip','$year','$month','$day','$hour','$minute','$second','$device','$provider','$direction','$devicerpi','$temprpi','$loadrpi')");
 } else {
  $REQUESTED=$month;
@@ -99,18 +130,19 @@ if (!empty($_GET["time"])) {
  else {
   $MySQL_table=$MySQL_table2;
  }
- $tracking_list_db_total = MySQL_Query("SELECT * FROM $MySQL_table WHERE lat!='0.0' AND lon!='0.0' AND device='$device' AND time like '$year-$month-$day%' order by time asc");
+# $tracking_list_db_total = MySQL_Query("SELECT * FROM $MySQL_table WHERE lat!='0.0' AND lon!='0.0' AND device='$device' AND time like '$year-$month-$day%' order by time asc");
+ $tracking_list_db_total = MySQL_Query("SELECT * FROM $MySQL_table WHERE device='$device' AND time like '$year-$month-$day%' order by time asc");
  $tracking_list_db_row_total = MySQL_numrows ($tracking_list_db_total);
 
- $tracking_list_db = MySQL_Query("SELECT * FROM $MySQL_table WHERE lat!='0.0' AND lon!='0.0' AND device='$device' AND time like '$year-$month-$day%' GROUP BY DATE_FORMAT(`time`, '%H:%i') order by time desc");
+# $tracking_list_db = MySQL_Query("SELECT * FROM $MySQL_table WHERE lat!='0.0' AND lon!='0.0' AND device='$device' AND time like '$year-$month-$day%' GROUP BY DATE_FORMAT(`time`, '%H:%i') order by time desc");
+ $tracking_list_db = MySQL_Query("SELECT * FROM $MySQL_table WHERE device='$device' AND time like '$year-$month-$day%' GROUP BY DATE_FORMAT(`time`, '%H:%i') order by time desc");
+
  $tracking_list_db_row = MySQL_numrows ($tracking_list_db);
  if ($SHOW == "1") {
   $ZTK_DEVICES="<tr>
   <td align=\"center\">
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE01\" style=\"text-decoration:none\"><b>NODE01</b></a> -
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE02\" style=\"text-decoration:none\"><b>NODE02</b></a> -
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE03\" style=\"text-decoration:none\"><b>NODE03</b></a> -
-   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE04\" style=\"text-decoration:none\"><b>NODE04</b></a>
+   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE01\" style=\"text-decoration:none\"><b>NODE01</b></a>".str_repeat('&nbsp;', 5)."
+   <a href=\"?year=$year&amp;month=$month&amp;day=$day&amp;device=NODE02\" style=\"text-decoration:none\"><b>NODE02</b></a>".str_repeat('&nbsp;', 5)."
   </td>
  </tr>";
  } else {
@@ -118,17 +150,18 @@ if (!empty($_GET["time"])) {
 ";
  }
 
- echo "<table border=\"1\" width=\"364\" align=\"center\" bgcolor=\"$bgsob\">
+ echo "<table border=\"0\" width=\"260\" align=\"center\" >
 ".$ZTK_DEVICES."
  <tr>
-  <td colspan=\"4\" align=\"center\">
-   <a href=\"osm.php?year=$year&amp;month=$month&amp;day=$day&amp;device=$device\" target=\"_blank\" style=\"text-decoration:none\"><b>Zobraz mapu</b> ($tracking_list_db_row) / ($tracking_list_db_row_total)</a><br>
-   <a href=\"export.php?year=$year&amp;month=$month&amp;day=$day&amp;device=$device\" target=\"_blank\" style=\"text-decoration:none\"><b>Export Excel</a><br>
+  <td align=\"center\">
+   <a href=\"http://".$_SERVER["SERVER_NAME"]."/osm.php?year=$year&amp;month=$month&amp;day=$day&amp;device=$device\" target=\"_blank\" style=\"text-decoration:none\"><b>Zobraz mapu</b> ($tracking_list_db_row) / ($tracking_list_db_row_total)</a><br>
+   <a href=\"http://".$_SERVER["SERVER_NAME"]."/export.php?year=$year&amp;month=$month&amp;day=$day&amp;device=$device\" target=\"_blank\" style=\"text-decoration:none\"><b>Export Excel</a><br>
 
 </table>\n\n";
 
-
-#### KALENDAR
+############################################
+################# KALENDAR #################
+############################################
 class Calendar {
     /**
      * Constructor
@@ -144,6 +177,7 @@ class Calendar {
     public $currentDate=null;
     public $daysInMonth=0;
     public $naviHref= null;
+
     /********************* PUBLIC **********************/
     /**
     * print out the calendar
@@ -193,6 +227,7 @@ class Calendar {
     */
     public function _showDay($cellNumber){
         $this->device=$_GET["device"];
+        $this->selectedDAY=$_GET["day"];
         if($this->currentDay==0){
             $firstDayOfTheWeek = date('N',strtotime($this->currentYear.'-'.$this->currentMonth.'-01'));
             if(intval($cellNumber) == intval($firstDayOfTheWeek)){
@@ -202,16 +237,32 @@ class Calendar {
         if( ($this->currentDay!=0)&&($this->currentDay<=$this->daysInMonth) ){
             $this->currentDate = date('Y-m-d',strtotime($this->currentYear.'-'.$this->currentMonth.'-'.($this->currentDay)));
             $cellContent = $this->currentDay;
-	    if ($cellContent < 10) {
-	         $cellContent = '0'.$cellContent;
-	    }
+            if ($cellContent < 10) {
+                 $cellContent = '0'.$cellContent;
+            }
 
             $this->currentDay++;
         }else{
             $this->currentDate =null;
             $cellContent=null;
         }
-        return '<li><a href="?year='.$this->currentYear.'&amp;month='.$this->currentMonth.'&amp;day='.$cellContent.'&amp;device='.$this->device.'">'.$cellContent.'</a></li>';
+        /* Here is list of days */
+        $todayday = date('d');
+        $todayYmd = date('Ymd');
+        $this->selectedd=$_GET["day"];
+        $this->selectedm=$_GET["month"];
+        $this->selectedY=$_GET["year"];
+
+        if ($cellContent == $todayday) {
+         $bgcolor="style=\"background: #fb7171!important\"";
+        }
+
+        if ($cellContent == $this->selectedDAY) {
+         $bgcolor="style=\"background: #0ac910!important\"";
+        }
+
+        return '<li '.$bgcolor.'> <a href="?year='.$this->currentYear.'&amp;month='.$this->currentMonth.'&amp;day='.$cellContent.'&amp;device='.$this->device.'">'.$cellContent.'</a> </li>
+';
     }
     /**
     * create navigation
@@ -223,6 +274,7 @@ class Calendar {
         $preMonth = $this->currentMonth==1?12:intval($this->currentMonth)-1;
         $preYear = $this->currentMonth==1?intval($this->currentYear)-1:$this->currentYear;
         return
+        /* Calendar menu */
             '<div class="header">'.
                 '<a class="prev" href="'.$this->naviHref.'?month='.sprintf('%02d',$preMonth).'&amp;year='.$preYear.'&amp;device='.$this->device.'"> <<< </a>'.
                 '<span class="title"><a href="?">'.date('Y M',strtotime($this->currentYear.'-'.$this->currentMonth.'-1')).'</a> </span>'.
@@ -272,7 +324,9 @@ class Calendar {
 }
 $calendar = new Calendar();
 echo $calendar->show();
-#### KALENDAR
+############################################
+################# KALENDAR #################
+############################################
 
 
 function distanceCalculation($point1_lat, $point1_long, $point2_lat, $point2_long, $unit = 'km', $decimals = 5) {
@@ -301,6 +355,7 @@ $ZTK_PARAM_MENU="
   <td bgcolor=\"#000000\"><font color=\"00FAAA\"><b>Satelity</b></font></td>
   <td bgcolor=\"#000000\"><font color=\"00FAAA\"><b>Čas</b></font></td>
   <td bgcolor=\"#000000\"><font color=\"00FAAA\"><b>IP</b></font></td>
+  <td bgcolor=\"#000000\"><font color=\"00FAAA\"><b>Provider</b></font></td>
   <td bgcolor=\"#000000\"><font color=\"00FAAA\"><b>Miesto</b></font></td>
   <td bgcolor=\"#000000\"><font color=\"00FAAA\"><b>ŠPZ</b></font></td>".$ZTK_PARAM_MENU."
  </tr>
@@ -325,7 +380,7 @@ $km_st=0;
 
   $bgmiesto='#ffffff';
 
-  include ('locations.php');
+#  include ('locations.php');
 ############################################
 ############## GPS TO ADDRESS ##############
 ############################################
@@ -356,13 +411,34 @@ $km_st=0;
     if($m[2] != '') {
      $miesto="GGL: ".$m[2];
      MySQL_Query("INSERT INTO $MySQL_table3 VALUES('$GET_LAT','$GET_LON','$m[2]','OK');");
+
     } else {
-     $miesto="GGL ERR: no info";
+#     $miesto="GGL ERR: no info";
+     $miesto="";
     }
    }
   }
 ############################################
 ############## GPS TO ADDRESS ##############
+############################################
+
+############################################
+############## IP TO PROVIDER ##############
+############################################
+  $IP=$entries['ip'];
+  $ISP_DB=MySQL_Query("SELECT provider FROM $MySQL_table4 WHERE ip='$IP' LIMIT 1;");
+  $ISP_DB_ROW = MySQL_numrows ($ISP_DB);
+  if ($ISP_DB_ROW == "1" ) {
+   $ISP=mysql_fetch_array ($ISP_DB);
+   $ispprovider=$ISP['provider'];
+  } else {
+   $details = json_decode(file_get_contents("http://ipinfo.io/$IP?token=$TOKENIP"));
+   $ispprovider=$details->org;
+#   echo "INSERT INTO $MySQL_table4 VALUES('$IP','$ispprovider'); <br>";
+   MySQL_Query("INSERT INTO $MySQL_table4 VALUES('$IP','$ispprovider');");
+  }
+############################################
+############## IP TO PROVIDER ##############
 ############################################
 
   if ($entries['provider'] == 'network') { $bgmiesto='#f0f000'; }
@@ -392,7 +468,6 @@ $km_st=0;
   } else {
    $ZTK_PARAM_DATA='';
   }
-
   $WEB_MIDDLE=$WEB_MIDDLE.' <tr>
   <td bgcolor="'.$bgmiesto.'">'.$entries['id'].'</td>
   <td bgcolor="'.$bgmiesto.'">'.$i.'</td>
@@ -404,10 +479,11 @@ $km_st=0;
   <td bgcolor="'.$bgmiesto.'" align="center">'.$entries['sat'].'</td>
   <td bgcolor="'.$bgmiesto.'">'.str_replace("T"," / ",$entries['time']).'</td>
   <td bgcolor="'.$bgmiesto.'">'.$entries['ip'].'</td>
+  <td bgcolor="'.$bgmiesto.'">'.$ispprovider.'</td>
   <td bgcolor="'.$bgmiesto.'">'.$miesto.'</td>
   <td bgcolor="'.$bgmiesto.'">'.$entries['device'].'</td>'.$ZTK_PARAM_DATA.'
  </tr>
-'; 
+';
 
   $KM=$KM+$km2;
  }
